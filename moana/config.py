@@ -82,7 +82,7 @@ GOOGLE_CALENDAR_TOKEN_PATH = os.getenv(
 # ─── Schedule ───────────────────────────────────────────────
 BRIEF_HOUR = int(os.getenv("MOANA_BRIEF_HOUR", "8"))
 BRIEF_MINUTE = int(os.getenv("MOANA_BRIEF_MINUTE", "0"))
-TIMEZONE = "US/Eastern"
+TIMEZONE = "America/New_York"
 
 # ─── Identity ──────────────────────────────────────────────
 AGENT_NAME = "Moana"

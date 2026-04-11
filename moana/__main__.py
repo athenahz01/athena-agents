@@ -61,6 +61,23 @@ async def send_morning_brief(app: Application):
             pass
 
 
+async def send_weekly_recap(app: Application):
+    """Build and send the Sunday weekly recap."""
+    log.info("🌊 Building weekly recap...")
+
+    from moana.services.recap_builder import build_weekly_recap
+    from moana.formatters.telegram_formatter import format_weekly_recap
+    from moana.services.activity import cleanup_old_data
+
+    try:
+        data = build_weekly_recap()
+        await send_message(app, config.TELEGRAM_CHAT_ID, format_weekly_recap(data))
+        cleanup_old_data(days_to_keep=30)
+        log.info("✅ Weekly recap sent!")
+    except Exception as e:
+        log.error(f"❌ Weekly recap failed: {e}", exc_info=True)
+
+
 # ─── Main ────────────────────────────────────────────────────
 
 async def main():
@@ -98,8 +115,7 @@ async def main():
         log.warning(f"Startup message failed: {e}")
 
     # Schedule daily brief
-    tz = pytz.timezone(config.TIMEZONE)
-    scheduler = AsyncIOScheduler(timezone=tz)
+    scheduler = AsyncIOScheduler(timezone="America/New_York")
     scheduler.add_job(
         send_morning_brief,
         "cron",
@@ -110,10 +126,25 @@ async def main():
         name="Daily Morning Brief",
         misfire_grace_time=3600,
     )
+
+    # Schedule weekly recap — Sunday 8 PM ET
+    scheduler.add_job(
+        send_weekly_recap,
+        "cron",
+        day_of_week="sun",
+        hour=20,
+        minute=0,
+        args=[app],
+        id="weekly_recap",
+        name="Weekly Recap",
+        misfire_grace_time=3600,
+    )
+
     scheduler.start()
     log.info(
         f"⏰ Brief scheduled: {config.BRIEF_HOUR}:{config.BRIEF_MINUTE:02d} {config.TIMEZONE}"
     )
+    log.info("⏰ Weekly recap scheduled: Sunday 8:00 PM ET")
 
     # Start polling
     log.info("🤖 Polling for messages...")
