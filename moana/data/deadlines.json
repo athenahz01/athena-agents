@@ -1,0 +1,22 @@
+{
+  "deadlines": [
+    {
+      "title": "Whetstone Portal — SAT split (Math + English)",
+      "date": "2026-04-30T23:59:00",
+      "category": "Whetstone"
+    },
+    {
+      "title": "Whetstone Portal — Student dashboard redesign",
+      "date": "2026-04-25T23:59:00",
+      "category": "Whetstone"
+    },
+    {
+      "title": "Political Network Explorer — UI polish",
+      "date": "2026-05-01T23:59:00",
+      "category": "Side Project"
+    }
+  ],
+  "reminders": [
+    "Review athenahuo.com FormSubmit inbox"
+  ]
+}

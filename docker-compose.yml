@@ -1,0 +1,31 @@
+services:
+  moana:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python -m moana
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - moana-data:/app/moana/data
+      - moana-logs:/app/moana/logs
+
+  # ingrid:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command: python -m ingrid
+  #   env_file: .env
+  #   restart: unless-stopped
+
+  # stella:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command: python -m stella
+  #   env_file: .env
+  #   restart: unless-stopped
+
+volumes:
+  moana-data:
+  moana-logs:
