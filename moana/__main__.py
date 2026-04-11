@@ -3,9 +3,24 @@
 Entry point: python -m moana
 """
 
+# ─── Force timezone data availability (must be before any other imports) ─────
+# Docker slim images lack timezone data. Install tzdata into Python's
+# zoneinfo search path so APScheduler's ZoneInfo() calls work.
+import subprocess
+import sys
+
+try:
+    from zoneinfo import ZoneInfo
+    ZoneInfo("America/New_York")  # test it
+except Exception:
+    # tzdata not available — install it at runtime
+    subprocess.check_call(
+        [sys.executable, "-m", "pip", "install", "tzdata", "-q"]
+    )
+
+# ─── Normal imports ──────────────────────────────────────────
 import asyncio
 import logging
-import sys
 from pathlib import Path
 
 import pytz
@@ -109,7 +124,7 @@ async def main():
         await send_message(
             app,
             config.TELEGRAM_CHAT_ID,
-            "🌊 Moana is online! 早安 ☀️\nType /help for commands.",
+            "🌊 Moana is online!\nType /help for commands.",
         )
     except Exception as e:
         log.warning(f"Startup message failed: {e}")
