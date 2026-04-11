@@ -4,12 +4,13 @@ Brief builder — gathers all of Moana's data sources into one dict.
 
 import logging
 import random
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
-import pytz
 from moana import config
 
 log = logging.getLogger(__name__)
+
+ET = timezone(timedelta(hours=-4))
 
 _QUOTES = [
     "You're not behind. You're building something most people don't have the guts to start.",
@@ -42,8 +43,7 @@ def build_morning_brief() -> dict:
     from moana.services.calendar_service import get_todays_events
     from moana.services.deadlines import get_upcoming_deadlines
 
-    tz = pytz.timezone(config.TIMEZONE)
-    now = datetime.now(tz)
+    now = datetime.now(ET)
 
     data = {
         "date": now.strftime("%A, %B %d, %Y"),

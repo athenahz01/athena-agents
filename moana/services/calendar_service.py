@@ -4,12 +4,13 @@ Falls back gracefully if credentials aren't configured.
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
-import pytz
 from moana import config
 
 log = logging.getLogger(__name__)
+
+ET = timezone(timedelta(hours=-4))
 
 
 def get_todays_events() -> list:
@@ -50,8 +51,7 @@ def get_todays_events() -> list:
 
     service = build("calendar", "v3", credentials=creds)
 
-    tz = pytz.timezone(config.TIMEZONE)
-    now = datetime.now(tz)
+    now = datetime.now(ET)
     start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
     end_of_day = start_of_day + timedelta(days=1)
 

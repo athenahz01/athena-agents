@@ -1,30 +1,17 @@
 """
 🌊 Moana — Athena's Chief of Staff
 Entry point: python -m moana
+
+Uses a simple asyncio timer instead of APScheduler to avoid
+timezone/tzdata issues on Docker slim images.
 """
 
-# ─── Force timezone data availability (must be before any other imports) ─────
-# Docker slim images lack timezone data. Install tzdata into Python's
-# zoneinfo search path so APScheduler's ZoneInfo() calls work.
-import subprocess
-import sys
-
-try:
-    from zoneinfo import ZoneInfo
-    ZoneInfo("America/New_York")  # test it
-except Exception:
-    # tzdata not available — install it at runtime
-    subprocess.check_call(
-        [sys.executable, "-m", "pip", "install", "tzdata", "-q"]
-    )
-
-# ─── Normal imports ──────────────────────────────────────────
 import asyncio
 import logging
+import sys
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-import pytz
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from telegram.ext import Application
 
 from core.telegram_utils import send_message
@@ -48,11 +35,18 @@ logging.basicConfig(
 )
 log = logging.getLogger("moana")
 
+# Eastern Time as fixed UTC offset (EDT = UTC-4, EST = UTC-5)
+# Using EDT; off by 1 hour in winter — close enough for a morning brief
+ET = timezone(timedelta(hours=-4))
 
-# ─── Scheduled morning brief ────────────────────────────────
+
+def _now_et() -> datetime:
+    return datetime.now(ET)
+
+
+# ─── Scheduled tasks ────────────────────────────────────────
 
 async def send_morning_brief(app: Application):
-    """Build and send the daily morning brief."""
     log.info("🌊 Building morning brief...")
 
     from moana.services.brief_builder import build_morning_brief
@@ -77,7 +71,6 @@ async def send_morning_brief(app: Application):
 
 
 async def send_weekly_recap(app: Application):
-    """Build and send the Sunday weekly recap."""
     log.info("🌊 Building weekly recap...")
 
     from moana.services.recap_builder import build_weekly_recap
@@ -91,6 +84,45 @@ async def send_weekly_recap(app: Application):
         log.info("✅ Weekly recap sent!")
     except Exception as e:
         log.error(f"❌ Weekly recap failed: {e}", exc_info=True)
+
+
+async def scheduler_loop(app: Application):
+    """Simple scheduler — checks every 30s if it's time to fire."""
+    brief_sent_today = False
+    recap_sent_this_week = False
+    last_date = None
+
+    while True:
+        now = _now_et()
+        today = now.strftime("%Y-%m-%d")
+
+        # Reset flags at midnight
+        if today != last_date:
+            brief_sent_today = False
+            if now.weekday() == 0:  # Monday
+                recap_sent_this_week = False
+            last_date = today
+
+        # Morning brief
+        if (
+            not brief_sent_today
+            and now.hour == config.BRIEF_HOUR
+            and now.minute >= config.BRIEF_MINUTE
+        ):
+            await send_morning_brief(app)
+            brief_sent_today = True
+
+        # Weekly recap — Sunday 8 PM
+        if (
+            not recap_sent_this_week
+            and now.weekday() == 6
+            and now.hour == 20
+            and now.minute >= 0
+        ):
+            await send_weekly_recap(app)
+            recap_sent_this_week = True
+
+        await asyncio.sleep(30)
 
 
 # ─── Main ────────────────────────────────────────────────────
@@ -119,7 +151,16 @@ async def main():
     except Exception as e:
         log.warning(f"Could not set bot commands: {e}")
 
-    # Startup message
+    # Start polling for messages
+    await app.updater.start_polling(drop_pending_updates=True)
+    log.info("🤖 Polling for messages...")
+
+    # Scheduler info
+    now = _now_et()
+    log.info(f"⏰ Brief: {config.BRIEF_HOUR}:{config.BRIEF_MINUTE:02d} ET | Recap: Sun 8 PM ET")
+    log.info(f"🕐 Current ET: {now.strftime('%I:%M %p')}")
+
+    # Startup message — ONLY after everything works
     try:
         await send_message(
             app,
@@ -129,49 +170,12 @@ async def main():
     except Exception as e:
         log.warning(f"Startup message failed: {e}")
 
-    # Schedule daily brief
-    scheduler = AsyncIOScheduler(timezone="America/New_York")
-    scheduler.add_job(
-        send_morning_brief,
-        "cron",
-        hour=config.BRIEF_HOUR,
-        minute=config.BRIEF_MINUTE,
-        args=[app],
-        id="morning_brief",
-        name="Daily Morning Brief",
-        misfire_grace_time=3600,
-    )
-
-    # Schedule weekly recap — Sunday 8 PM ET
-    scheduler.add_job(
-        send_weekly_recap,
-        "cron",
-        day_of_week="sun",
-        hour=20,
-        minute=0,
-        args=[app],
-        id="weekly_recap",
-        name="Weekly Recap",
-        misfire_grace_time=3600,
-    )
-
-    scheduler.start()
-    log.info(
-        f"⏰ Brief scheduled: {config.BRIEF_HOUR}:{config.BRIEF_MINUTE:02d} {config.TIMEZONE}"
-    )
-    log.info("⏰ Weekly recap scheduled: Sunday 8:00 PM ET")
-
-    # Start polling
-    log.info("🤖 Polling for messages...")
-    await app.updater.start_polling(drop_pending_updates=True)
-
+    # Run forever
     try:
-        while True:
-            await asyncio.sleep(3600)
+        await scheduler_loop(app)
     except (KeyboardInterrupt, SystemExit):
         log.info("🌊 Moana shutting down...")
     finally:
-        scheduler.shutdown()
         await app.updater.stop()
         await app.stop()
         await app.shutdown()
