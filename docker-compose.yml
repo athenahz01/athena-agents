@@ -10,13 +10,16 @@ services:
       - moana-data:/app/moana/data
       - moana-logs:/app/moana/logs
 
-  # ingrid:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   command: python -m ingrid
-  #   env_file: .env
-  #   restart: unless-stopped
+  ingrid:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python -m ingrid
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - ingrid-data:/app/ingrid/data
+      - ingrid-logs:/app/ingrid/logs
 
   # stella:
   #   build:
@@ -29,3 +32,5 @@ services:
 volumes:
   moana-data:
   moana-logs:
+  ingrid-data:
+  ingrid-logs:
