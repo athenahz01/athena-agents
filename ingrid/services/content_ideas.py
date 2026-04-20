@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 
 def generate_idea(topic: str = None, account: str = None) -> str:
-    """Generate a specific content idea. Arc-aware for @athenahuo."""
+    """Generate a specific content idea. Arc-aware for @athena_huo."""
     account = account or config.DEFAULT_ACCOUNT
     acct = config.account_config(account)
     ctx = get_context()
@@ -33,8 +33,8 @@ def generate_idea(topic: str = None, account: str = None) -> str:
         topic_hint = "No pillar specified — pick one that fits today's phase"
 
     # Account-specific constraints
-    if account == "athenahuo":
-        account_constraints = f"""ACCOUNT: @athenahuo (growth / story-driven)
+    if account == "athena_huo":
+        account_constraints = f"""ACCOUNT: @athena_huo (growth / story-driven)
 ACT: {ctx['act']} — {ctx['phase']}
 DAYS TO GRADUATION: {ctx['days_to_graduation']}
 COUNTDOWN SUFFIX FOR CAPTION: "{ctx['countdown_suffix'] or '(none — post-arc)'}"
@@ -70,7 +70,7 @@ Required output (use these exact headers):
 📝 OUTLINE: [3-5 bullet points of the content flow — include voiceover beats + b-roll for DITL]
 📝 CAPTION: [draft caption following rules for this account]
 🎵 AUDIO: [specific audio suggestion from playbook list or rationale]
-📣 CTA: [playbook rule — @athenahuo rarely has CTAs; @athena_hz can have one]
+📣 CTA: [playbook rule — @athena_huo rarely has CTAs; @athena_hz can have one]
 🧪 TRIAL REEL?: [Yes/No + why]
 💡 WHY THIS WORKS: [2 sentences — arc fit, algorithm logic, audience fit]
 

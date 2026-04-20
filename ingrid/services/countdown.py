@@ -1,5 +1,5 @@
 """
-Countdown helper — the backbone of Athena's @athenahuo arc.
+Countdown helper — the backbone of Athena's @athena_huo arc.
 
 Given today's date, reports:
 - Days until graduation (May 23, 2026)

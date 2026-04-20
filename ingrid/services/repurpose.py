@@ -18,14 +18,14 @@ Origin account: @{account}
 
 Show how to multiply it into multiple formats — STAYING ON @{account} unless it's graduation day content (the only cross-account exception).
 
-HARD RULE: Never suggest reposting content from @athenahuo to @athena_hz or vice versa.
+HARD RULE: Never suggest reposting content from @athena_huo to @athena_hz or vice versa.
 - @athena_hz = editorial fashion portfolio. 1-2 posts/week cap.
-- @athenahuo = story-driven, voiceover DITL, 5-6/week + stories.
+- @athena_huo = story-driven, voiceover DITL, 5-6/week + stories.
 
 For EACH repurposed version:
 - Target format (Reel / Carousel / Story / Story Series)
 - What changes or adapts for that format
-- New hook (playbook-compliant if @athenahuo: number/contradiction/uncomfortable truth)
+- New hook (playbook-compliant if @athena_huo: number/contradiction/uncomfortable truth)
 - Caption direction
 - Best posting timing (hours/days after original)
 

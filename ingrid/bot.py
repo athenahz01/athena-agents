@@ -30,7 +30,7 @@ def _parse_account(args: list) -> tuple[str | None, list]:
     """Extract an account override from args.
 
     Flags accepted:
-      --hz / --huo / @athena_hz / @athenahuo
+      --hz / --huo / @athena_hz / @athena_huo
 
     Returns (account, remaining_args). account is None if no flag present.
     """
@@ -40,8 +40,8 @@ def _parse_account(args: list) -> tuple[str | None, list]:
         low = a.lower()
         if low in ("--hz", "@athena_hz", "athena_hz"):
             account = "athena_hz"
-        elif low in ("--huo", "@athenahuo", "athenahuo"):
-            account = "athenahuo"
+        elif low in ("--huo", "@athena_huo", "athena_huo"):
+            account = "athena_huo"
         else:
             out.append(a)
     return account, out
@@ -51,7 +51,7 @@ def _parse_account(args: list) -> tuple[str | None, list]:
 
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "📸 Hey Athena! Ingrid here — your content strategist for @athenahuo (growth) + @athena_hz (portfolio).\n\n"
+        "📸 Hey Athena! Ingrid here — your content strategist for @athena_huo (growth) + @athena_hz (portfolio).\n\n"
         "I run the playbook: DITL format, countdown arc, playbook-compliant hooks + captions, two-account separation.\n\n"
         "Daily check-in at 9am ET. Type /help to see everything.\n\n"
         "Try:\n"
@@ -100,7 +100,7 @@ async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def cmd_idea(update: Update, context: ContextTypes.DEFAULT_TYPE):
     account, rest = _parse_account(context.args or [])
     topic = " ".join(rest) if rest else None
-    await update.message.reply_text(f"📸 Cooking up an idea for @{account or 'athenahuo'}...")
+    await update.message.reply_text(f"📸 Cooking up an idea for @{account or 'athena_huo'}...")
 
     from ingrid.services.content_ideas import generate_idea
 
@@ -157,7 +157,7 @@ async def cmd_hooks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Usage: /hooks [--hz|--huo] <reel topic>")
         return
 
-    await update.message.reply_text(f"📸 Generating hooks for @{account or 'athenahuo'}...")
+    await update.message.reply_text(f"📸 Generating hooks for @{account or 'athena_huo'}...")
 
     from ingrid.services.hooks import generate_hooks
 
@@ -387,7 +387,7 @@ async def cmd_hero(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ctx = get_context()
     days = ctx["days_to_graduation"]
 
-    prompt = f"""Plan the GRADUATION HERO REEL for @athenahuo — the biggest post of Act 1.
+    prompt = f"""Plan the GRADUATION HERO REEL for @athena_huo — the biggest post of Act 1.
 
 Context:
 - Today is {ctx['today']} ({days} days to graduation)

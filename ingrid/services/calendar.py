@@ -1,5 +1,5 @@
 """
-Content calendar — arc-aware weekly plan for @athenahuo (+ optional @athena_hz slots).
+Content calendar — arc-aware weekly plan for @athena_huo (+ optional @athena_hz slots).
 """
 
 import logging
@@ -35,8 +35,8 @@ def log_post(description: str, format_type: str, account: str = None, performanc
         desc_lower = description.lower()
         if "@athena_hz" in desc_lower or "athena_hz" in desc_lower:
             account = "athena_hz"
-        elif "@athenahuo" in desc_lower or "athenahuo" in desc_lower:
-            account = "athenahuo"
+        elif "@athena_huo" in desc_lower or "athena_huo" in desc_lower:
+            account = "athena_huo"
         else:
             account = config.DEFAULT_ACCOUNT
 
@@ -96,20 +96,20 @@ CURRENT PILLARS (weighted):
 {history_str}
 
 RULES:
-- @athenahuo: 5-6 posts this week (near-daily during Act 1 Phase 3). Include at least one bold reveal at most.
+- @athena_huo: 5-6 posts this week (near-daily during Act 1 Phase 3). Include at least one bold reveal at most.
 - @athena_hz: 1-2 posts max, editorial only, don't exceed cap.
-- Every @athenahuo post is voiceover DITL (35s) unless flagged as bold reveal.
-- Every @athenahuo caption ends with the countdown suffix for THAT day.
+- Every @athena_huo post is voiceover DITL (35s) unless flagged as bold reveal.
+- Every @athena_huo caption ends with the countdown suffix for THAT day.
 - Rotate pillars per their weights (Last Times 40%, Aesthetic Daily Life 30%, Grad Prep 20%, Moat 10%).
 - Weekday posts: 7-9am or 7-9pm ET. Weekend: 10-11am or 8-10pm ET. Sunday: 7-9pm ET peak.
 
 Format each day EXACTLY like:
 📅 [Day, Date] ({{countdown suffix}})
-📱 Account: @athenahuo OR @athena_hz OR REST/Stories-only
+📱 Account: @athena_huo OR @athena_hz OR REST/Stories-only
 🎬 Format: [DITL Reel / Bold Reveal / Carousel / Post / REST]
 💡 Concept: [one line — specific, arc-connected]
-🪝 Hook: [exact opening line — number/contradiction/uncomfortable truth for @athenahuo]
-📝 Caption: ["day N. [observation]. {{countdown}}." for @athenahuo]
+🪝 Hook: [exact opening line — number/contradiction/uncomfortable truth for @athena_huo]
+📝 Caption: ["day N. [observation]. {{countdown}}." for @athena_huo]
 ⏰ Post at: [time in ET]
 
 End with a "Week Strategy" paragraph: how this week moves the arc, which KPIs you're optimizing for, and what success looks like by Sunday.

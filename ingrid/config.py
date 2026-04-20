@@ -1,6 +1,6 @@
 """
 Ingrid's configuration — Content & Social Media Strategist.
-Manages TWO accounts: @athena_hz (portfolio) and @athenahuo (story-driven).
+Manages TWO accounts: @athena_hz (portfolio) and @athena_huo (story-driven).
 
 All strategic rules live in data/strategy.json (source of truth).
 This file wires env vars + builds the system prompt from strategy.json.
@@ -23,8 +23,8 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 CLAUDE_MODEL = "claude-sonnet-4-20250514"
 
 # ─── Default account (override per command with /account switch) ──
-# Valid values: "athenahuo" (default — growth account) or "athena_hz" (portfolio)
-DEFAULT_ACCOUNT = os.getenv("INGRID_DEFAULT_ACCOUNT", "athenahuo")
+# Valid values: "athena_huo" (default — growth account) or "athena_hz" (portfolio)
+DEFAULT_ACCOUNT = os.getenv("INGRID_DEFAULT_ACCOUNT", "athena_huo")
 
 # ─── Strategy loader ────────────────────────────────────────
 STRATEGY_FILE = Path(__file__).parent / "data" / "strategy.json"
@@ -44,7 +44,7 @@ def account_config(handle: str = None) -> dict:
     """Return account-specific config block."""
     handle = handle or DEFAULT_ACCOUNT
     accounts = _STRATEGY.get("accounts", {})
-    return accounts.get(handle, accounts.get("athenahuo", {}))
+    return accounts.get(handle, accounts.get("athena_huo", {}))
 
 
 # ─── Instagram Graph API (future) ───────────────────────────
@@ -61,7 +61,7 @@ CHECKIN_MINUTE = int(os.getenv("INGRID_CHECKIN_MINUTE", "0"))
 def _build_system_prompt() -> str:
     s = _STRATEGY
     hz = s.get("accounts", {}).get("athena_hz", {})
-    huo = s.get("accounts", {}).get("athenahuo", {})
+    huo = s.get("accounts", {}).get("athena_huo", {})
 
     top5_remember = "\n".join(f"- {x}" for x in s.get("top_5_remember", []))
     top5_avoid = "\n".join(f"- {x}" for x in s.get("top_5_avoid", []))
@@ -88,9 +88,9 @@ You manage strategy for TWO accounts with INTENTIONALLY DIFFERENT positioning:
 - Cadence: {hz.get('posting_cadence', '')}
 - Tone: {hz.get('tone', '')}
 - STATUS: {hz.get('status', 'Active')}
-- DO NOT on @athena_hz: voiceover DITL, emotional posts, NYC content, engineering content, crossover from @athenahuo.
+- DO NOT on @athena_hz: voiceover DITL, emotional posts, NYC content, engineering content, crossover from @athena_huo.
 
-━━━ @athenahuo (growth / story-driven) ━━━
+━━━ @athena_huo (growth / story-driven) ━━━
 {huo.get('positioning', '')}
 - Bio: {huo.get('bio', '')}
 - Cadence: {huo.get('posting_cadence', '')}
@@ -100,7 +100,7 @@ You manage strategy for TWO accounts with INTENTIONALLY DIFFERENT positioning:
 
 Default account when unspecified: @{DEFAULT_ACCOUNT}.
 
-━━━ THE ARC (@athenahuo) ━━━
+━━━ THE ARC (@athena_huo) ━━━
 Launch: {s.get('timeline', {}).get('launch_date', '')}
 Graduation (Act 1 finale): {s.get('timeline', {}).get('graduation_date', '')}
 NYC move: {s.get('timeline', {}).get('nyc_move', '')}
@@ -116,12 +116,12 @@ Every post connects to the arc. Every post ends with the countdown (e.g., "15 to
 
 Bold reveal = secondary format. Max 1 per week. Face-only, no b-roll, no music, 20-25s.
 
-━━━ HOOK RULES (@athenahuo) ━━━
+━━━ HOOK RULES (@athena_huo) ━━━
 Every opening line must do ONE of:
 {hook_types}
 NEVER open with: {never_open}
 
-━━━ CAPTION RULES (@athenahuo) ━━━
+━━━ CAPTION RULES (@athena_huo) ━━━
 DITL structure: "day [x]. [one observation about the day]. [countdown]."
 Bold reveal: 2-4 sentences. Reflective. No lists, no emojis, no CTA.
 Captions MUST NEVER:

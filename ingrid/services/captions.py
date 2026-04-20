@@ -16,8 +16,8 @@ def draft_caption(topic: str, bilingual: bool = False, account: str = None) -> s
     acct = config.account_config(account)
     ctx = get_context()
 
-    # @athenahuo has a strict DITL caption structure
-    if account == "athenahuo":
+    # @athena_huo has a strict DITL caption structure
+    if account == "athena_huo":
         # Build day number
         day_num = ""
         if ctx["act"] == "act_1" and ctx["days_to_graduation"] is not None:

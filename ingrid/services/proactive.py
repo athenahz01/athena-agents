@@ -3,7 +3,7 @@ Daily proactive check-in — Ingrid's 9am strategic nudge.
 
 Viralt-style daily manager mode, now arc-aware: factors in days-until-graduation,
 current phase (establish/open loop/land moment), and the primary growth account
-(@athenahuo) vs portfolio account (@athena_hz).
+(@athena_huo) vs portfolio account (@athena_hz).
 """
 
 import json
@@ -90,12 +90,12 @@ def build_checkin() -> str:
     inspo = _load_json(INSPO_FILE, [])
 
     # Cadence checks per account
-    huo_days_since = _days_since_last_post(history, account="athenahuo")
+    huo_days_since = _days_since_last_post(history, account="athena_huo")
     hz_days_since = _days_since_last_post(history, account="athena_hz")
     huo_this_week = sum(
         1
         for h in history
-        if h.get("account") == "athenahuo"
+        if h.get("account") == "athena_huo"
         and "date" in h
         and (now - datetime.fromisoformat(h["date"])).days <= 7
     )
@@ -129,13 +129,13 @@ def build_checkin() -> str:
     if ctx["countdown_suffix"]:
         signals.append(f"Caption suffix: \"{ctx['countdown_suffix']}\"")
 
-    # @athenahuo cadence (5-6/week target)
+    # @athena_huo cadence (5-6/week target)
     if huo_days_since is None:
-        signals.append("@athenahuo: no posts logged yet")
+        signals.append("@athena_huo: no posts logged yet")
     elif huo_days_since >= 2 and ctx["act"] == "act_1":
-        signals.append(f"⚠️ @athenahuo: {huo_days_since} days silent — act 1 needs near-daily cadence")
+        signals.append(f"⚠️ @athena_huo: {huo_days_since} days silent — act 1 needs near-daily cadence")
     if ctx["act"] == "act_1" and huo_this_week < 4:
-        signals.append(f"@athenahuo: only {huo_this_week} posts this week — target 5-6")
+        signals.append(f"@athena_huo: only {huo_this_week} posts this week — target 5-6")
 
     # @athena_hz cadence (1-2/week target)
     if hz_this_week > 2:
@@ -143,7 +143,7 @@ def build_checkin() -> str:
 
     # Day-of-week
     if day == "Sunday":
-        signals.append("Sunday — @athenahuo prime lifestyle window 7-9pm ET. Weekly review day.")
+        signals.append("Sunday — @athena_huo prime lifestyle window 7-9pm ET. Weekly review day.")
     elif day in ("Saturday", "Sunday"):
         signals.append("Weekend — lifestyle/slow-living performs")
     else:
@@ -172,7 +172,7 @@ CURRENT ACT'S CONTENT PILLARS:
 Your job: deliver a SHORT, strategic morning brief. Structure EXACTLY like this, using these headers:
 
 🎯 TODAY'S MOVE
-[Specify WHICH ACCOUNT. Then ONE specific action — if @athenahuo, include format (DITL/bold reveal), hook (one of: number/contradiction/uncomfortable truth), and the countdown suffix if Act 1. If @athena_hz, only suggest if week's 1-2 cap allows. Be CONCRETE.]
+[Specify WHICH ACCOUNT. Then ONE specific action — if @athena_huo, include format (DITL/bold reveal), hook (one of: number/contradiction/uncomfortable truth), and the countdown suffix if Act 1. If @athena_hz, only suggest if week's 1-2 cap allows. Be CONCRETE.]
 
 📊 WHY
 [1-2 sentences grounded in the arc, the phase, the KPI priorities (saves/shares > likes), or her data]
@@ -185,9 +185,9 @@ Your job: deliver a SHORT, strategic morning brief. Structure EXACTLY like this,
 
 Rules:
 - No fluff. No "good morning!" No emoji spam.
-- If @athenahuo post today, write an example hook using number/contradiction/uncomfortable truth format.
+- If @athena_huo post today, write an example hook using number/contradiction/uncomfortable truth format.
 - If Act 1, include the countdown ("X to go.") in any caption examples.
-- Never suggest "teach 5 tips" style content for @athenahuo.
+- Never suggest "teach 5 tips" style content for @athena_huo.
 - Under 220 words.
 """
 

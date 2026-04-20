@@ -16,9 +16,9 @@ def generate_hooks(topic: str, count: int = 5, account: str = None) -> str:
     acct = config.account_config(account)
     ctx = get_context()
 
-    # For @athenahuo, enforce the strict 3-hook-type rule
-    if account == "athenahuo":
-        hook_constraint = """STRICT HOOK RULES (@athenahuo playbook):
+    # For @athena_huo, enforce the strict 3-hook-type rule
+    if account == "athena_huo":
+        hook_constraint = """STRICT HOOK RULES (@athena_huo playbook):
 Every hook MUST do ONE of these three things:
   A) Drop a specific number (e.g., "I woke up at 9:48. 28 days before graduation.")
   B) Contradict a belief (e.g., "The last month at Cornell is not what it looks like on Instagram.")
@@ -44,7 +44,7 @@ For each of the {count} hooks:
 4. Predicted strength (🔥🔥🔥 / 🔥🔥 / 🔥)"""
 
     countdown_note = ""
-    if account == "athenahuo" and ctx["countdown_suffix"] and ctx["act"] == "act_1":
+    if account == "athena_huo" and ctx["countdown_suffix"] and ctx["act"] == "act_1":
         countdown_note = f"\nCURRENT COUNTDOWN CONTEXT: Today is {ctx['days_to_graduation']} days before graduation. You can reference the number in numerical hooks if natural."
 
     prompt = f"""Generate {count} hook variations for an Instagram Reel about: {topic}

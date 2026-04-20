@@ -5,8 +5,8 @@
     "note": "Living document. Update monthly."
   },
   "big_picture": {
-    "strategy": "Two accounts, intentionally separated. @athena_hz = portfolio. @athenahuo = person behind it. Never duplicate. Cross-promote sparingly (one story mention per week max). Over time @athenahuo becomes the primary identity; @athena_hz becomes the portfolio to point at for paid work.",
-    "only_overlap": "Graduation day May 23 is the ONE day both accounts post about the same event \u2014 different versions: @athenahuo = emotional DITL reel, @athena_hz = polished lookbook."
+    "strategy": "Two accounts, intentionally separated. @athena_hz = portfolio. @athena_huo = person behind it. Never duplicate. Cross-promote sparingly (one story mention per week max). Over time @athena_huo becomes the primary identity; @athena_hz becomes the portfolio to point at for paid work.",
+    "only_overlap": "Graduation day May 23 is the ONE day both accounts post about the same event \u2014 different versions: @athena_huo = emotional DITL reel, @athena_hz = polished lookbook."
   },
   "accounts": {
     "athena_hz": {
@@ -17,7 +17,7 @@
       "tone": "Editorial, polished, high production value",
       "posting_cadence": "1-2 posts per week, quality over quantity",
       "content_types": ["fashion shoots", "OOTDs", "makeup looks", "brand content"],
-      "status": "KEEP AS IS during the transition. Do not rebuild while @athenahuo is launching.",
+      "status": "KEEP AS IS during the transition. Do not rebuild while @athena_huo is launching.",
       "do": [
         "Post 1-2 editorial-quality posts per week, no more",
         "Continue UGC collaborations that fit existing aesthetic",
@@ -26,13 +26,13 @@
       "do_not": [
         "No voiceover DITL content",
         "No emotional/vulnerable posts",
-        "No NYC moving content (that's @athenahuo exclusive)",
+        "No NYC moving content (that's @athena_huo exclusive)",
         "No engineering/moat content",
-        "No crossover from @athenahuo"
+        "No crossover from @athena_huo"
       ]
     },
-    "athenahuo": {
-      "handle": "@athenahuo",
+    "athena_huo": {
+      "handle": "@athena_huo",
       "positioning": "The last month of one life, the first month of another. Two-act show about a transition from Cornell to NYC, posted in real time.",
       "purpose": "Audience building \u2014 the real follower growth account.",
       "audience": "People who want to follow a person, not a brand",
@@ -187,7 +187,7 @@
     {"title": "Tame Impala moody tracks", "note": "Editorial content"}
   ],
   "posting_schedule": {
-    "athenahuo": {
+    "athena_huo": {
       "per_week": "5-6 feed posts + daily stories",
       "weekdays": "7-9am ET or 7-9pm ET",
       "weekends": "10-11am ET or 8-10pm ET",
@@ -212,7 +212,7 @@
       {"metric": "follows_from_post", "weight": 6, "note": "The conversion metric that matters most."},
       {"metric": "likes", "weight": 7, "note": "Vanity metric. Barely matters for distribution."}
     ],
-    "growth_targets_athenahuo": {
+    "growth_targets_athena_huo": {
       "end_of_april": "500-1,000 followers, 1 reel >5k views",
       "graduation_day_may_23": "2,000-3,000 followers, graduation reel breakout",
       "end_of_june_1mo_nyc": "5,000 followers, consistent 3k+ views/reel, first brand DM",
@@ -270,6 +270,6 @@
     "Long captions that teach or instruct \u2014 wrong account",
     "Posting about the company name or specific job details",
     "Copying sw_v01's shock-reveal style too hard \u2014 wrong CPM ceiling",
-    "Crossover between @athena_hz and @athenahuo (except graduation day)"
+    "Crossover between @athena_hz and @athena_huo (except graduation day)"
   ]
 }
