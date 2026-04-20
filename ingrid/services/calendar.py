@@ -1,5 +1,5 @@
 """
-Content calendar — generate a strategic weekly posting schedule.
+Content calendar — arc-aware weekly plan for @athenahuo (+ optional @athena_hz slots).
 """
 
 import logging
@@ -9,6 +9,7 @@ from pathlib import Path
 
 from core.claude_client import oneshot
 from ingrid import config
+from ingrid.services.countdown import get_context, current_pillars
 
 log = logging.getLogger(__name__)
 
@@ -28,71 +29,90 @@ def _save_history(history: list):
         json.dump(history, f, indent=2, ensure_ascii=False)
 
 
-def log_post(description: str, format_type: str, performance: str = ""):
-    """Log a post for future calendar optimization."""
+def log_post(description: str, format_type: str, account: str = None, performance: str = ""):
+    """Log a post. Account defaults to DEFAULT_ACCOUNT but is inferred from description if possible."""
+    if not account:
+        desc_lower = description.lower()
+        if "@athena_hz" in desc_lower or "athena_hz" in desc_lower:
+            account = "athena_hz"
+        elif "@athenahuo" in desc_lower or "athenahuo" in desc_lower:
+            account = "athenahuo"
+        else:
+            account = config.DEFAULT_ACCOUNT
+
     history = _load_history()
     history.append({
         "date": datetime.now().isoformat(),
+        "account": account,
         "description": description,
         "format": format_type,
         "performance": performance,
     })
-    # Keep last 50 entries
-    history = history[-50:]
+    history = history[-100:]  # keep last 100
     _save_history(history)
 
 
 def generate_calendar(days: int = 7) -> str:
-    """Generate a content calendar for the next N days."""
+    """Arc-aware content calendar."""
     today = datetime.now()
-    dates = [(today + timedelta(days=i)).strftime("%A, %B %d") for i in range(days)]
-    dates_str = "\n".join(f"- {d}" for d in dates)
+    ctx = get_context(today.date())
+    dates = []
+    for i in range(days):
+        d = today + timedelta(days=i)
+        d_ctx = get_context(d.date())
+        suffix = d_ctx.get("countdown_suffix") or ""
+        dates.append(f"- {d.strftime('%A, %B %d')} ({suffix})".rstrip(" ()"))
+    dates_str = "\n".join(dates)
 
-    # Include recent post history for context
     history = _load_history()
     history_str = ""
     if history:
         recent = history[-10:]
         history_str = "\nRecent posts:\n"
         for h in recent:
-            history_str += f"- {h['date'][:10]}: {h['description']} ({h['format']})"
+            history_str += f"- {h['date'][:10]} [@{h.get('account', '?')}]: {h['description']} ({h['format']})"
             if h.get("performance"):
                 history_str += f" — {h['performance']}"
             history_str += "\n"
 
     pillars_str = "\n".join(
-        f"- {p['name']}: {p['description']} [{', '.join(p['formats'])}]"
-        for p in config.CONTENT_PILLARS
+        f"- {p.get('name', '')} ({p.get('weight', 0)}%): {p.get('description', '')}"
+        for p in current_pillars()
     )
 
-    prompt = f"""Create a content calendar for @athena_hz for the next {days} days.
+    prompt = f"""Build a content calendar for the next {days} days.
 
-Dates:
+ARC CONTEXT:
+- Current act: {ctx['act']} — {ctx['phase']}
+- Phase focus: {ctx['phase_focus']}
+- Days to graduation: {ctx['days_to_graduation']}
+
+DATES (with caption countdown suffix where applicable):
 {dates_str}
 
-Content pillars:
+CURRENT PILLARS (weighted):
 {pillars_str}
 
 {history_str}
 
-Rules:
-- 4-5 posts per week (not every day — quality > quantity)
-- Rotate pillars — don't repeat the same type back to back
-- Include at least 1 trial reel for testing new ideas
-- Specify: day, format, concept, hook, and whether it's a trial reel
-- Leave 1-2 days as rest/engagement days (no posting, just stories + engagement)
-- Consider the day of week (weekends = lifestyle, weekdays = tips/value content)
-- If there's a seasonal/timely hook, prioritize it
+RULES:
+- @athenahuo: 5-6 posts this week (near-daily during Act 1 Phase 3). Include at least one bold reveal at most.
+- @athena_hz: 1-2 posts max, editorial only, don't exceed cap.
+- Every @athenahuo post is voiceover DITL (35s) unless flagged as bold reveal.
+- Every @athenahuo caption ends with the countdown suffix for THAT day.
+- Rotate pillars per their weights (Last Times 40%, Aesthetic Daily Life 30%, Grad Prep 20%, Moat 10%).
+- Weekday posts: 7-9am or 7-9pm ET. Weekend: 10-11am or 8-10pm ET. Sunday: 7-9pm ET peak.
 
-Format each day like:
-📅 [Day, Date]
-[Post / Rest / Trial Reel]
-🎬 Format: [type]
-💡 Concept: [one line]
-🪝 Hook: [opening line]
-📝 Notes: [any extra context]
+Format each day EXACTLY like:
+📅 [Day, Date] ({{countdown suffix}})
+📱 Account: @athenahuo OR @athena_hz OR REST/Stories-only
+🎬 Format: [DITL Reel / Bold Reveal / Carousel / Post / REST]
+💡 Concept: [one line — specific, arc-connected]
+🪝 Hook: [exact opening line — number/contradiction/uncomfortable truth for @athenahuo]
+📝 Caption: ["day N. [observation]. {{countdown}}." for @athenahuo]
+⏰ Post at: [time in ET]
 
-End with a "Week Strategy" summary: what the overall posting rhythm is optimizing for.
+End with a "Week Strategy" paragraph: how this week moves the arc, which KPIs you're optimizing for, and what success looks like by Sunday.
 """
 
     return oneshot(
@@ -100,5 +120,5 @@ End with a "Week Strategy" summary: what the overall posting rhythm is optimizin
         model=config.CLAUDE_MODEL,
         prompt=prompt,
         system_prompt=config.SYSTEM_PROMPT,
-        max_tokens=1200,
+        max_tokens=1500,
     )

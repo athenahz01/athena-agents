@@ -1,5 +1,5 @@
 """
-Review — analyze post performance and suggest strategic adjustments.
+Review — analyze post performance against the playbook's KPI priority.
 """
 
 import logging
@@ -9,29 +9,48 @@ from ingrid import config
 log = logging.getLogger(__name__)
 
 
-def review_post(description: str) -> str:
-    """Analyze a post's performance and suggest what to do next."""
-    prompt = f"""Athena is describing how her latest Instagram post performed: {description}
+def review_post(description: str, account: str = None) -> str:
+    """Analyze performance with playbook KPI priority (saves > shares > watch time > comments > profile > follows > likes)."""
+    account = account or config.DEFAULT_ACCOUNT
+    acct = config.account_config(account)
 
-Analyze this and give her:
+    prompt = f"""Athena is describing her latest post on @{account}: {description}
+
+Account positioning: {acct.get('positioning', '')}
+
+PLAYBOOK KPI PRIORITY (in order of what actually matters):
+1. Saves — signals content worth returning to (highest algorithmic weight 2026)
+2. Shares — signals worth sending to someone
+3. Watch time / completion rate — first 2 seconds decide distribution
+4. Comments — engaged audience > passive
+5. Profile visits — interest in YOU
+6. Follows from a post — conversion metric that matters
+7. Likes — vanity, barely matters for distribution
+
+PLAYBOOK RED FLAGS (apply if patterns show):
+- Views declining WoW → format too varied, not consistent enough
+- Followers up, engagement down → audience misaligned, bold reveal attracting wrong crowd
+- Saves < 1% of views → not save-worthy, need more specificity/reflection
+- Follows stalling under 1k for 6+ weeks → positioning not hitting, rework hooks
+
+Give Athena:
 
 📊 PERFORMANCE ASSESSMENT
-- Is this good, average, or underperforming? (relative to a ~5K-20K follower fashion/lifestyle account)
-- What metric matters most for this type of content?
+[Is this good/avg/underperforming for @{account}? Which KPI matters MOST for this content type and how did it do on that KPI?]
 
 🔍 WHY IT PERFORMED THIS WAY
-- 2-3 specific reasons (hook strength, timing, format choice, topic relevance)
-- Be honest — if the content had issues, say so directly
+[2-3 specific reasons — hook strength (did it match playbook hook rules?), format choice, timing, pillar fit, audio fit. Be direct.]
+
+🚩 RED FLAG CHECK
+[Any of the playbook red flags triggered? If yes, which one and the fix.]
 
 🔄 WHAT TO DO NEXT
-- Should she repurpose this content? How?
-- Should she double down on this topic/format or pivot?
-- Specific adjustments for the next similar post
+[Repurpose? Double down? Pivot? Specific next-post adjustments.]
 
 🧪 TEST SUGGESTION
-- One specific trial reel idea based on what she learned from this post
+[ONE trial reel idea using what you learned. Playbook-compliant hook + format.]
 
-Be data-minded and strategic. No cheerleading — give her real analysis.
+Be direct and data-minded. No cheerleading. No "great job!"
 """
 
     return oneshot(
@@ -39,5 +58,5 @@ Be data-minded and strategic. No cheerleading — give her real analysis.
         model=config.CLAUDE_MODEL,
         prompt=prompt,
         system_prompt=config.SYSTEM_PROMPT,
-        max_tokens=800,
+        max_tokens=900,
     )

@@ -1,6 +1,5 @@
 """
-Trending — surface trending formats, audios, and content styles on Instagram.
-Uses Claude's knowledge + web search context.
+Trending — surface trending formats + audios, filtered through the playbook.
 """
 
 import logging
@@ -12,33 +11,46 @@ from ingrid import config
 log = logging.getLogger(__name__)
 
 
-def get_trending(niche: str = None) -> str:
-    """Get what's trending on Instagram right now for @athena_hz's niche."""
+def get_trending(niche: str = None, account: str = None) -> str:
+    """What's trending, framed for the target account."""
+    account = account or config.DEFAULT_ACCOUNT
+    acct = config.account_config(account)
     month = datetime.now().strftime("%B %Y")
-    niche_str = niche or config.INSTAGRAM_NICHE
 
-    prompt = f"""What's trending on Instagram Reels RIGHT NOW ({month}) that's relevant for a {niche_str} creator?
+    # Pull the playbook's current audio list
+    strategy = config.load_strategy()
+    current_audio = strategy.get("trending_audio_april_2026", [])
+    audio_lines = "\n".join(
+        f"- \"{a.get('title', '')}\" {'by ' + a.get('artist', '') if a.get('artist') else ''} — {a.get('note', '')}"
+        for a in current_audio
+    )
 
-Break it down into:
+    prompt = f"""What's trending on Instagram Reels RIGHT NOW ({month}) that's relevant for @{account}?
 
-🎵 TRENDING AUDIOS
-- 3-4 audios/sounds that are currently viral and relevant
-- For each: name, how creators are using it, and whether it fits @athena_hz
+Account positioning: {acct.get('positioning', '')}
+Aesthetic: {acct.get('aesthetic', '')}
 
-📐 TRENDING FORMATS
-- 3-4 reel formats/templates that are getting high reach right now
-- For each: description, why it works, and a specific idea for @athena_hz
+PLAYBOOK AUDIO SHORTLIST (April 2026, refresh monthly):
+{audio_lines}
 
-📈 ALGORITHM INSIGHTS
-- What Instagram is currently prioritizing (reel length, engagement type, etc.)
-- Any recent feature updates creators should use (trial reels, collabs, etc.)
+Produce:
 
-🎯 NICHE-SPECIFIC TRENDS
-- What's working specifically in fashion/lifestyle/UGC content right now
-- Any seasonal trends to hop on this month
+🎵 AUDIO FIT
+[Pick 2-3 from the playbook shortlist that fit THIS account right now. For each: one reel idea using it.]
 
-Be specific with audio names and format descriptions — not vague "trending dance" stuff.
-If you're not 100% sure an audio is current, say so — better to be honest than outdated.
+📐 FORMATS GAINING REACH
+[3 reel/carousel formats that are performing right now in {acct.get('positioning', '')} niche. Be specific — format, pacing, what makes it pop.]
+
+📈 ALGORITHM SIGNAL
+[What Instagram is currently rewarding — prioritize saves/shares insight, first-2-sec watch, completion rate. Anything from trial reels or recent feature updates.]
+
+🎯 ACCOUNT-SPECIFIC ANGLE
+[For @{account} specifically, the ONE format+audio combo to test THIS week. Include hook opener.]
+
+Rules:
+- Be honest if you're unsure an audio is still hot — say so.
+- Don't suggest anything that violates @{account}'s "do not" list.
+- No generic "trending dance" fluff.
 """
 
     return oneshot(

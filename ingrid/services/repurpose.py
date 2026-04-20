@@ -1,5 +1,5 @@
 """
-Repurpose — take one piece of content and suggest how to multiply it.
+Repurpose — multiply one piece of content. Respects the two-account separation rule.
 """
 
 import logging
@@ -9,24 +9,32 @@ from ingrid import config
 log = logging.getLogger(__name__)
 
 
-def suggest_repurpose(content_description: str) -> str:
-    """Suggest how to repurpose a piece of content across formats."""
-    prompt = f"""I have this content: {content_description}
+def suggest_repurpose(content_description: str, account: str = None) -> str:
+    """Suggest repurposing paths. NEVER suggests cross-posting between the two accounts."""
+    account = account or config.DEFAULT_ACCOUNT
 
-Show me how to repurpose it into multiple Instagram formats for @athena_hz.
+    prompt = f"""Athena has this content: {content_description}
+Origin account: @{account}
+
+Show how to multiply it into multiple formats — STAYING ON @{account} unless it's graduation day content (the only cross-account exception).
+
+HARD RULE: Never suggest reposting content from @athenahuo to @athena_hz or vice versa.
+- @athena_hz = editorial fashion portfolio. 1-2 posts/week cap.
+- @athenahuo = story-driven, voiceover DITL, 5-6/week + stories.
 
 For EACH repurposed version:
-- Format (Reel / Carousel / Story / Story Series / Post)
-- What to change or adapt
-- New hook for that format
-- Best time to post relative to the original (same day? next day? next week?)
+- Target format (Reel / Carousel / Story / Story Series)
+- What changes or adapts for that format
+- New hook (playbook-compliant if @athenahuo: number/contradiction/uncomfortable truth)
+- Caption direction
+- Best posting timing (hours/days after original)
 
-Also suggest:
-- Which version to post FIRST for maximum reach
-- Which version works as a trial reel test
-- Any cross-platform opportunities (TikTok, Pinterest, Threads)
+Also:
+- Which version posts FIRST for max reach
+- Which works as a trial reel test
+- Cross-platform spillover: TikTok? Pinterest? Threads? (different than cross-account)
 
-Think like a content strategist maximizing one shoot/idea into a full week of content.
+Think like a content director maximizing one shoot into a week of posts.
 """
 
     return oneshot(
@@ -34,5 +42,5 @@ Think like a content strategist maximizing one shoot/idea into a full week of co
         model=config.CLAUDE_MODEL,
         prompt=prompt,
         system_prompt=config.SYSTEM_PROMPT,
-        max_tokens=800,
+        max_tokens=900,
     )

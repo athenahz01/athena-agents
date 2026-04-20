@@ -1,0 +1,275 @@
+{
+  "meta": {
+    "version": "2026-04-20",
+    "source": "athenahuo_master_reference.docx",
+    "note": "Living document. Update monthly."
+  },
+  "big_picture": {
+    "strategy": "Two accounts, intentionally separated. @athena_hz = portfolio. @athenahuo = person behind it. Never duplicate. Cross-promote sparingly (one story mention per week max). Over time @athenahuo becomes the primary identity; @athena_hz becomes the portfolio to point at for paid work.",
+    "only_overlap": "Graduation day May 23 is the ONE day both accounts post about the same event \u2014 different versions: @athenahuo = emotional DITL reel, @athena_hz = polished lookbook."
+  },
+  "accounts": {
+    "athena_hz": {
+      "handle": "@athena_hz",
+      "positioning": "Polished fashion, modeling, UGC portfolio",
+      "purpose": "Brand deal showcase. Where rate decks are sent. Where brands vet her.",
+      "audience": "Brands, PR agencies, fashion-adjacent followers",
+      "tone": "Editorial, polished, high production value",
+      "posting_cadence": "1-2 posts per week, quality over quantity",
+      "content_types": ["fashion shoots", "OOTDs", "makeup looks", "brand content"],
+      "status": "KEEP AS IS during the transition. Do not rebuild while @athenahuo is launching.",
+      "do": [
+        "Post 1-2 editorial-quality posts per week, no more",
+        "Continue UGC collaborations that fit existing aesthetic",
+        "Save graduation outfit for @athena_hz as a polished fashion post (the ONE overlap)"
+      ],
+      "do_not": [
+        "No voiceover DITL content",
+        "No emotional/vulnerable posts",
+        "No NYC moving content (that's @athenahuo exclusive)",
+        "No engineering/moat content",
+        "No crossover from @athenahuo"
+      ]
+    },
+    "athenahuo": {
+      "handle": "@athenahuo",
+      "positioning": "The last month of one life, the first month of another. Two-act show about a transition from Cornell to NYC, posted in real time.",
+      "purpose": "Audience building \u2014 the real follower growth account.",
+      "audience": "People who want to follow a person, not a brand",
+      "tone": "Warm, observational, slightly literary, occasionally dry-funny",
+      "posting_cadence": "5-6 posts per week + daily stories",
+      "content_types": ["voiceover DITL reels", "bold reveals", "occasional carousels", "stories"],
+      "bio": "cornell meng '26 \u00b7 systems + software | ithaca \u2192 nyc this fall | life, taste, & the occasional spreadsheet | athenahuo.com",
+      "vibe": "Ivy ambition \u00d7 editorial taste \u00d7 cozy slow-living \u00d7 occasional dry wit",
+      "voice": "Warm, observational, slightly literary, honest, quiet confidence",
+      "aesthetic": "Warm parchment palette (cream, sienna, desaturated green). Film grain. No heavy filters. No bright pastels."
+    }
+  },
+  "content_pillars": {
+    "act_1": {
+      "period": "2026-04-23 to 2026-05-23",
+      "theme": "The countdown era. Every post connects to one story: last month at Cornell.",
+      "pillars": [
+        {"name": "Last Times", "weight": 40, "description": "Countdown energy. Nostalgia. Specific Ithaca moments. 'things I'll miss.'"},
+        {"name": "Aesthetic Daily Life", "weight": 30, "description": "Morning routines, apartment, coffee, film shots, winery/park trips, study."},
+        {"name": "Graduation Prep", "weight": 20, "description": "Outfit, nails, cap-and-gown, makeup, the whole runway."},
+        {"name": "The Moat", "weight": 10, "description": "One post per 7-10 days. Engineer/builder/creative texture. NOT tech tutorials \u2014 subtle, woven in."}
+      ]
+    },
+    "act_2": {
+      "period": "2026-06 onward",
+      "theme": "The NYC era. Still one story: figuring out a new city and a new job.",
+      "pillars": [
+        {"name": "Figuring It Out", "weight": 35, "description": "Apartment hunt, moving, first subway, getting lost, new-city confusion."},
+        {"name": "First Job / Adult Girl", "weight": 25, "description": "Vague-but-fancy. 'strategy/analytics at a tech company.' Coffee before office, walks home, sunday resets."},
+        {"name": "NYC Aesthetic", "weight": 30, "description": "Cafes, outfits, walks, weekend life, neighborhoods."},
+        {"name": "The Moat", "weight": 10, "description": "Builder/creative side continues."}
+      ]
+    }
+  },
+  "timeline": {
+    "launch_date": "2026-04-23",
+    "graduation_date": "2026-05-23",
+    "nyc_move": "2026-06-early",
+    "bridge_period": "2026-05-24 to 2026-05-31",
+    "act_2_launch": "2026-06-early",
+    "phases_act_1": [
+      {"name": "Phase 1: Establish the World", "period": "2026-04-23 to 2026-05-02", "focus": "Introduce character (you), place (Ithaca), premise. Aesthetic daily life + occasional last-times.", "goal": "500-1000 followers, visual identity locked"},
+      {"name": "Phase 2: Open the Loop", "period": "2026-05-03 to 2026-05-12", "focus": "Countdown references become explicit. Graduation prep starts. 1-2 posts hit above baseline reach.", "goal": "1,500-2,500 followers"},
+      {"name": "Phase 3: Land the Moment", "period": "2026-05-13 to 2026-05-23", "focus": "Daily posting. Outfit reveals, cap-and-gown, senior week. Graduation reel is the hero.", "goal": "3,000-5,000 followers + hero reel >10k views"}
+    ]
+  },
+  "formats": {
+    "voiceover_ditl": {
+      "role": "Main format",
+      "structure": [
+        {"beat": "0-5s", "instruction": "Face to camera. Deliver the opening hook. This is the whole game."},
+        {"beat": "5-8s", "instruction": "Face to camera or cut to b-roll. Setup line that makes the hook make sense."},
+        {"beat": "8-30s", "instruction": "B-roll of the day, voiceover over the top. Timestamps overlaid on beats."},
+        {"beat": "30-35s", "instruction": "Closing line (voiceover). Closing text overlay with countdown number."}
+      ],
+      "voiceover_recording": [
+        "Record AFTER shooting b-roll, not during",
+        "Voice memo app, quiet room, phone 6 inches from mouth",
+        "Slightly slower, slightly quieter than normal conversation",
+        "Natural pauses between sentences \u2014 gives editing room",
+        "Memorize the beats, not the exact words"
+      ]
+    },
+    "bold_reveal": {
+      "role": "Secondary format",
+      "cadence": "Once per week max",
+      "use_for": ["Real emotional truth", "Strategic reveals", "Account intro posts", "Transition moments"],
+      "rules": [
+        "Face-to-camera only. No b-roll. No music. Natural light. 20-25 seconds.",
+        "One long thought. Not a montage. One coherent idea delivered with pauses.",
+        "Half-smile closer. Never grin. Observation, not performance."
+      ]
+    }
+  },
+  "hook_rules": {
+    "must_do_one_of": [
+      {"type": "specific_number", "example": "I woke up at 9:48. 28 days before graduation."},
+      {"type": "contradict_belief", "example": "The last month at Cornell is not what it looks like on Instagram."},
+      {"type": "uncomfortable_truth", "example": "I cried in the library last night."}
+    ],
+    "never_open_with": [
+      "people keep asking me",
+      "everyone says",
+      "so today",
+      "guys",
+      "hi guys",
+      "New post!"
+    ]
+  },
+  "caption_rules": {
+    "ditl_structure": "day [x]. [one observation about the day]. [countdown].",
+    "ditl_examples": [
+      "day one. the ordinary ones go the fastest. 29 to go.",
+      "day two. slow is a skill. 28 to go.",
+      "day three. collecting the small things. 27 to go."
+    ],
+    "bold_reveal_caption": "2-4 sentences. Reflective. No lists, no emojis, no CTA.",
+    "never": [
+      "Teach or instruct (no '5 tips for X'). Documenting, not explaining.",
+      "Contain more than 2 emojis",
+      "Start with 'New post!' or 'Hi guys'",
+      "Use the word 'girlies'",
+      "Contain hashtags in caption (those go in first comment)"
+    ]
+  },
+  "countdown_mechanic": {
+    "format": "[x] to go.",
+    "special": {"2026-05-23": "today. (replaces number \u2014 the one post where the countdown breaks)"},
+    "post_graduation": {
+      "2026-05-24_to_2026-05-31": "Bridge content \u2014 packing, final Ithaca moments",
+      "2026-06-01_to_2026-06-06": "Moving week \u2014 apartment arrival, first NYC days",
+      "2026-06-07_onward": "New countdown: 'week 1 in nyc.' Or new framing: 'city 1, month 1.'"
+    }
+  },
+  "aesthetic": {
+    "palette": {
+      "primary": ["#F5EFE6 cream", "#A0522D sienna", "#8B7355 warm brown"],
+      "secondary": ["sage green muted", "deep olive"],
+      "never": ["bright pastels", "saturated pinks", "neon", "pure white backgrounds"]
+    },
+    "lighting": [
+      "Natural light whenever possible",
+      "Window light on the SIDE of face, not straight on",
+      "Golden hour (6-7:30pm Apr/May) > midday",
+      "Avoid fluorescent \u2014 phone flash BANNED",
+      "If indoor, one warm lamp > overhead lights"
+    ],
+    "editing_reels": {
+      "clip_length_avg": "3-4s (slow days 4-5s, hard days 2-3s)",
+      "slow_mo_max": 1,
+      "transitions": "No TikTok fast-zoom",
+      "fonts": {"titles": "Playfair Display (serif)", "subtitles": "Inter or Helvetica (sans-serif)"},
+      "color_grade": "saturation -10 to -15, warmth +5 to +7, shadows slightly lifted",
+      "audio_mix": "Background music 10-20% so voiceover/ambient always priority"
+    },
+    "editing_photos": {
+      "warmth": "+5 to +10",
+      "saturation": "-10 to -15",
+      "film_grain": "VSCO A6 or A4, dialed back 30-40%",
+      "rule": "Never oversaturate"
+    },
+    "film_camera": "Differentiator. Film photos get 2-3x saves of digital. Aim for 1-2 film photos per week.",
+    "grid_cohesion": "Plan 9 posts ahead. Alternate textures: face \u2192 object \u2192 landscape. Avoid two of the same type side by side."
+  },
+  "trending_audio_april_2026": [
+    {"title": "Someday We Will Dream About Today", "artist": "@theswaysmusic", "note": "Series signature, use for bookends"},
+    {"title": "American Girls", "artist": "Harry Styles", "note": "Versatile, universally works"},
+    {"title": "DAISIES", "artist": "Justin Bieber", "note": "Chill lifestyle"},
+    {"title": "Ray Mysterio", "artist": "The Alchemist", "note": "Cinematic, makes rough footage look intentional"},
+    {"title": "Loving Life Again", "artist": "Ella Langley", "note": "Fresh-start arcs"},
+    {"title": "Mimi Chill Music acoustic tracks", "note": "Slow-living, mornings"},
+    {"title": "Tame Impala moody tracks", "note": "Editorial content"}
+  ],
+  "posting_schedule": {
+    "athenahuo": {
+      "per_week": "5-6 feed posts + daily stories",
+      "weekdays": "7-9am ET or 7-9pm ET",
+      "weekends": "10-11am ET or 8-10pm ET",
+      "sunday": "7-9pm ET (peak lifestyle watch hours)",
+      "reel_length": "15-40s. Sweet spot 25-35s."
+    }
+  },
+  "hashtags": {
+    "rule": "Always in first comment, never in caption. Exactly 5 tags. 2 niche + 2 mid + 1 broad.",
+    "tier_1_niche_under_100k": ["#ithacany", "#cornellmeng", "#cornellgrad", "#gradschoolvlog", "#cornelluniversity"],
+    "tier_2_mid_100k_to_1M": ["#ivyleagueaesthetic", "#postgradlife", "#movingtoinyc", "#slowliving", "#gradschoollife"],
+    "tier_3_broad_1M_plus": ["#dayinmylife", "#nyclife", "#lifestyle", "#aesthetic"],
+    "example_mix": "#ithacany #cornellmeng #slowliving #postgradlife #dayinmylife"
+  },
+  "kpis": {
+    "priority_order": [
+      {"metric": "saves", "weight": 1, "note": "Signals content worth returning to. Highest algorithmic weight 2026."},
+      {"metric": "shares", "weight": 2, "note": "Signals worth sending to someone. Second highest."},
+      {"metric": "watch_time_completion", "weight": 3, "note": "First 2 seconds decide distribution. Completion to end = more push."},
+      {"metric": "comments", "weight": 4, "note": "Engaged audience > passive."},
+      {"metric": "profile_visits", "weight": 5, "note": "Interest in YOU, not just the post."},
+      {"metric": "follows_from_post", "weight": 6, "note": "The conversion metric that matters most."},
+      {"metric": "likes", "weight": 7, "note": "Vanity metric. Barely matters for distribution."}
+    ],
+    "growth_targets_athenahuo": {
+      "end_of_april": "500-1,000 followers, 1 reel >5k views",
+      "graduation_day_may_23": "2,000-3,000 followers, graduation reel breakout",
+      "end_of_june_1mo_nyc": "5,000 followers, consistent 3k+ views/reel, first brand DM",
+      "end_of_august": "10,000 followers, reliable engagement, first paid brand deal",
+      "12_months_in": "25,000-40,000 followers if arc sustains"
+    },
+    "weekly_review_sunday": [
+      "Views per post at 24hr + 7day marks",
+      "Saves + shares per post",
+      "New followers from the week",
+      "Top-performing post \u2014 what made it work",
+      "Lowest-performing post \u2014 what didn't land",
+      "Interesting comments + DMs (screenshot them)",
+      "Any brand / PR outreach"
+    ],
+    "red_flags": {
+      "views_declining_wow": "Reassess format \u2014 usually too much variety, not enough consistency",
+      "followers_up_engagement_down": "Audience misaligned \u2014 bold reveal content attracting wrong people",
+      "saves_under_1pct_of_views": "Not save-worthy \u2014 need more specificity or reflective content",
+      "follows_stalling_under_1k_for_6_weeks": "Positioning not hitting \u2014 rework hooks, try sharper reveals"
+    }
+  },
+  "job_talk": {
+    "say": ["operational analyst at a tech company", "strategy/analytics at a tech company in nyc"],
+    "dont_say": ["company name", "specific team", "anything identifying"]
+  },
+  "lessons_from_sw_v01": {
+    "what_she_did_right": [
+      "Picked ONE identity ('IB in SF') and hammered it",
+      "Used most searched/envied job on internet as her niche",
+      "Strong hooks \u2014 every reel opens with a clear contradiction or claim",
+      "Visual consistency \u2014 similar thumbnails, similar body of work"
+    ],
+    "what_we_stole": [
+      "One identity hammered: 'last month at cornell \u2192 moving to nyc'",
+      "Sharp hook structure for every post",
+      "Visual consistency through voiceover DITL format",
+      "Countdown mechanic \u2014 every post has a reason to exist within the larger arc"
+    ],
+    "what_we_did_differently": [
+      "Built-in acts \u2014 hers plateaus when she's no longer an IB analyst. Ours has act 2 (NYC) and act 3 (first year) ready.",
+      "Don't rely on shock-reveal alone (lower brand deal CPM)",
+      "Preserve @athena_hz's separate positioning for higher-paying fashion deals"
+    ]
+  },
+  "top_5_remember": [
+    "One story. last month at cornell \u2192 nyc. every post connects.",
+    "One format. voiceover DITL with 4-part structure. 1 bold reveal per week max.",
+    "Sharp hooks. numbers, contradictions, or uncomfortable truths. never 'people keep asking.'",
+    "Short captions. document, don't explain. day + observation + countdown.",
+    "Countdown always. every post ends with the number. it's the series signature."
+  ],
+  "top_5_avoid": [
+    "Format variety for its own sake \u2014 consistency wins",
+    "Long captions that teach or instruct \u2014 wrong account",
+    "Posting about the company name or specific job details",
+    "Copying sw_v01's shock-reveal style too hard \u2014 wrong CPM ceiling",
+    "Crossover between @athena_hz and @athenahuo (except graduation day)"
+  ]
+}

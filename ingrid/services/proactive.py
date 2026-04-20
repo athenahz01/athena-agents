@@ -1,20 +1,19 @@
 """
 Daily proactive check-in — Ingrid's 9am strategic nudge.
 
-This is the CORE Viralt.ai-style feature: instead of only responding to commands,
-Ingrid proactively reviews recent activity and surfaces the single most important
-thing Athena should focus on today.
-
-Fires from ingrid.__main__ on a schedule (default 9:00 AM ET, configurable).
+Viralt-style daily manager mode, now arc-aware: factors in days-until-graduation,
+current phase (establish/open loop/land moment), and the primary growth account
+(@athenahuo) vs portfolio account (@athena_hz).
 """
 
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 from core.claude_client import oneshot
 from ingrid import config
+from ingrid.services.countdown import get_context, current_pillars
 
 log = logging.getLogger(__name__)
 
@@ -40,11 +39,14 @@ def _save_json(path: Path, data):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 
-def _days_since_last_post(history: list) -> int | None:
-    if not history:
+def _days_since_last_post(history: list, account: str = None) -> int | None:
+    relevant = [
+        h for h in history if not account or h.get("account") == account
+    ] if account else history
+    if not relevant:
         return None
     try:
-        last = datetime.fromisoformat(history[-1]["date"])
+        last = datetime.fromisoformat(relevant[-1]["date"])
         return (datetime.now() - last).days
     except Exception:
         return None
@@ -59,8 +61,9 @@ def _format_recent_posts(history: list, n: int = 5) -> str:
         date = h.get("date", "")[:10]
         desc = h.get("description", "")
         fmt = h.get("format", "")
+        acct = h.get("account", "")
         perf = h.get("performance", "")
-        line = f"- {date}: [{fmt}] {desc}"
+        line = f"- {date} [{acct or '?'}] [{fmt}] {desc}"
         if perf:
             line += f" — {perf}"
         lines.append(line)
@@ -77,79 +80,115 @@ def _format_inspo(inspo: list, n: int = 3) -> str:
 
 
 def build_checkin() -> str:
-    """Build today's proactive check-in message."""
+    """Build today's proactive check-in. Arc-aware + two-account aware."""
     now = datetime.now()
     day = now.strftime("%A")
     date_str = now.strftime("%B %d")
 
+    ctx = get_context()
     history = _load_json(HISTORY_FILE, [])
     inspo = _load_json(INSPO_FILE, [])
-    days_since = _days_since_last_post(history)
-    posts_this_week = sum(
+
+    # Cadence checks per account
+    huo_days_since = _days_since_last_post(history, account="athenahuo")
+    hz_days_since = _days_since_last_post(history, account="athena_hz")
+    huo_this_week = sum(
         1
         for h in history
-        if "date" in h
+        if h.get("account") == "athenahuo"
+        and "date" in h
+        and (now - datetime.fromisoformat(h["date"])).days <= 7
+    )
+    hz_this_week = sum(
+        1
+        for h in history
+        if h.get("account") == "athena_hz"
+        and "date" in h
         and (now - datetime.fromisoformat(h["date"])).days <= 7
     )
 
-    # Situational flags for the prompt
+    # Signals
     signals = []
-    if days_since is None:
-        signals.append("No posts logged yet — help her start")
-    elif days_since >= 4:
-        signals.append(f"⚠️ {days_since} days since last post — momentum slipping")
-    elif days_since <= 1:
-        signals.append("Just posted — good moment for engagement push, not new post")
 
-    if posts_this_week < 2:
-        signals.append(f"Only {posts_this_week} posts this week — below 4-5/week target")
-    elif posts_this_week >= 5:
-        signals.append(f"{posts_this_week} posts this week — strong cadence")
+    # Arc-specific signals
+    if ctx["act"] == "act_1":
+        signals.append(f"🎯 ACT 1 · {ctx['phase']} · {ctx['days_to_graduation']} days to graduation")
+        signals.append(f"Phase focus: {ctx['phase_focus']}")
+    elif ctx["act"] == "bridge":
+        signals.append("🌉 BRIDGE period — packing/final Ithaca content, no countdown")
+    elif ctx["act"] == "moving_week":
+        signals.append("📦 MOVING WEEK — apartment arrival, first NYC days")
+    elif ctx["act"] == "act_2":
+        signals.append(f"🗽 ACT 2 · NYC era")
 
-    if day in ("Saturday", "Sunday"):
-        signals.append("Weekend — lifestyle content performs better")
+    # Graduation day special
+    if ctx["days_to_graduation"] == 0:
+        signals.append("⭐ GRADUATION DAY. Post simple photo/carousel with minimal caption today. Shoot everything. DO NOT edit hero reel today — edit May 24-25.")
+
+    # Countdown suffix to use in today's caption
+    if ctx["countdown_suffix"]:
+        signals.append(f"Caption suffix: \"{ctx['countdown_suffix']}\"")
+
+    # @athenahuo cadence (5-6/week target)
+    if huo_days_since is None:
+        signals.append("@athenahuo: no posts logged yet")
+    elif huo_days_since >= 2 and ctx["act"] == "act_1":
+        signals.append(f"⚠️ @athenahuo: {huo_days_since} days silent — act 1 needs near-daily cadence")
+    if ctx["act"] == "act_1" and huo_this_week < 4:
+        signals.append(f"@athenahuo: only {huo_this_week} posts this week — target 5-6")
+
+    # @athena_hz cadence (1-2/week target)
+    if hz_this_week > 2:
+        signals.append(f"⚠️ @athena_hz: {hz_this_week} posts this week — exceeds 1-2/week cap")
+
+    # Day-of-week
+    if day == "Sunday":
+        signals.append("Sunday — @athenahuo prime lifestyle window 7-9pm ET. Weekly review day.")
+    elif day in ("Saturday", "Sunday"):
+        signals.append("Weekend — lifestyle/slow-living performs")
     else:
-        signals.append("Weekday — value/tip content performs better")
+        signals.append("Weekday — post 7-9am ET or 7-9pm ET")
 
     signals_str = "\n".join(f"- {s}" for s in signals)
-
     pillars = "\n".join(
-        f"- {p['name']}: {p['description']}" for p in config.CONTENT_PILLARS
+        f"- {p.get('name', '')} ({p.get('weight', 0)}%): {p.get('description', '')}"
+        for p in current_pillars()
     )
 
-    prompt = f"""It's {day}, {date_str}. Give Athena her daily content check-in for @athena_hz.
+    prompt = f"""It's {day}, {date_str}. Give Athena her daily Ingrid check-in.
 
 SITUATIONAL SIGNALS:
 {signals_str}
 
-RECENT POSTS:
+RECENT POSTS (both accounts):
 {_format_recent_posts(history)}
 
 RECENT INSPO SAVED:
 {_format_inspo(inspo)}
 
-CONTENT PILLARS:
+CURRENT ACT'S CONTENT PILLARS:
 {pillars}
 
 Your job: deliver a SHORT, strategic morning brief. Structure EXACTLY like this, using these headers:
 
 🎯 TODAY'S MOVE
-[ONE specific thing to do today — post X, film Y, or engage instead of posting. Be concrete. Include format + hook if it's a post.]
+[Specify WHICH ACCOUNT. Then ONE specific action — if @athenahuo, include format (DITL/bold reveal), hook (one of: number/contradiction/uncomfortable truth), and the countdown suffix if Act 1. If @athena_hz, only suggest if week's 1-2 cap allows. Be CONCRETE.]
 
 📊 WHY
-[1-2 sentences — algorithm logic, timing, or pattern from her data]
+[1-2 sentences grounded in the arc, the phase, the KPI priorities (saves/shares > likes), or her data]
 
 🔥 QUICK HIT
-[ONE bite-sized tip she can execute in under 10 minutes — could be: story prompt, comment strategy, trending audio to save, caption tweak]
+[ONE under-10-min tactical thing — could be: a caption draft, a specific hook line, a b-roll shot to grab today, a trending audio to save, engagement move]
 
 💭 WATCHING FOR
-[ONE thing to pay attention to this week — a trend forming, a content pillar she's neglecting, an opportunity]
+[ONE thing to track this week — phase milestone, cadence risk, pillar she's neglected, arc moment coming up]
 
 Rules:
 - No fluff. No "good morning!" No emoji spam.
-- Be specific — not "post a reel," but "film 15-sec transition with the [specific trend] audio"
-- If she's behind on posting, push her gently. If she's on track, optimize.
-- Under 200 words total.
+- If @athenahuo post today, write an example hook using number/contradiction/uncomfortable truth format.
+- If Act 1, include the countdown ("X to go.") in any caption examples.
+- Never suggest "teach 5 tips" style content for @athenahuo.
+- Under 220 words.
 """
 
     response = oneshot(
@@ -157,20 +196,27 @@ Rules:
         model=config.CLAUDE_MODEL,
         prompt=prompt,
         system_prompt=config.SYSTEM_PROMPT,
-        max_tokens=600,
+        max_tokens=700,
     )
 
     # Log this check-in
     log_entry = {
         "date": now.isoformat(),
+        "act": ctx["act"],
+        "phase": ctx["phase"],
+        "days_to_graduation": ctx["days_to_graduation"],
         "signals": signals,
-        "posts_this_week": posts_this_week,
-        "days_since_last_post": days_since,
+        "huo_posts_this_week": huo_this_week,
+        "hz_posts_this_week": hz_this_week,
     }
     history_log = _load_json(CHECKIN_LOG, [])
     history_log.append(log_entry)
-    history_log = history_log[-60:]  # keep 60 days
+    history_log = history_log[-90:]
     _save_json(CHECKIN_LOG, history_log)
 
-    header = f"📸 <b>Ingrid — {day} Check-In</b>\n\n"
+    header = f"📸 <b>Ingrid — {day} Check-In</b>\n"
+    if ctx["days_to_graduation"] > 0 and ctx["act"] in ("act_1",):
+        header += f"<i>{ctx['days_to_graduation']} to go · {ctx['phase']}</i>\n\n"
+    else:
+        header += f"<i>{ctx['phase']}</i>\n\n"
     return header + response

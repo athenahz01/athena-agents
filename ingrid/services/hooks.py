@@ -1,32 +1,60 @@
 """
-Hooks — generate A/B hook variations for trial reel testing.
+Hooks — generate hook variations following the playbook's strict hook rules.
 """
 
 import logging
 from core.claude_client import oneshot
 from ingrid import config
+from ingrid.services.countdown import get_context
 
 log = logging.getLogger(__name__)
 
 
-def generate_hooks(topic: str, count: int = 5) -> str:
-    """Generate hook variations for A/B testing with trial reels."""
-    prompt = f"""Generate {count} different hook variations for an Instagram Reel about: {topic}
+def generate_hooks(topic: str, count: int = 5, account: str = None) -> str:
+    """Generate playbook-compliant hook variations for a Reel."""
+    account = account or config.DEFAULT_ACCOUNT
+    acct = config.account_config(account)
+    ctx = get_context()
 
-Account: @athena_hz ({config.INSTAGRAM_NICHE})
-Audience: {config.INSTAGRAM_AUDIENCE}
+    # For @athenahuo, enforce the strict 3-hook-type rule
+    if account == "athenahuo":
+        hook_constraint = """STRICT HOOK RULES (@athenahuo playbook):
+Every hook MUST do ONE of these three things:
+  A) Drop a specific number (e.g., "I woke up at 9:48. 28 days before graduation.")
+  B) Contradict a belief (e.g., "The last month at Cornell is not what it looks like on Instagram.")
+  C) State something uncomfortable (e.g., "I cried in the library last night.")
 
-For EACH hook, provide:
-1. The exact opening line (what's said or shown in first 2 seconds)
-2. Visual description (what the viewer sees)
-3. Hook type (curiosity gap / bold claim / relatable pain / controversy / tutorial promise)
-4. Predicted strength (🔥🔥🔥 = strong, 🔥🔥 = good, 🔥 = worth testing)
+NEVER open with: "people keep asking me," "everyone says," "so today," "guys," "hi guys," "New post!"
 
-Make them GENUINELY different approaches — not just rewording the same hook.
-At least one should be a "pattern interrupt" style hook (unexpected visual or statement).
-At least one should lead with a relatable problem.
+For each of the {count} hooks:
+1. The exact opening line (first 2 seconds, spoken or shown)
+2. Which type: A / B / C
+3. Visual description (face to camera? specific b-roll reveal?)
+4. Predicted strength (🔥🔥🔥 / 🔥🔥 / 🔥)
 
-End with a recommendation: which 2 hooks to test as trial reels first and why.
+End with: pick the TOP 2 to test as trial reels and say why.
+Each of the 5 hooks must be genuinely different — don't just reword."""
+    else:
+        hook_constraint = """@athena_hz is the polished portfolio account. Hooks should be editorial, fashion-led, visual-first.
+
+For each of the {count} hooks:
+1. The visual or statement shown/said in the first 2 seconds
+2. Hook type (outfit reveal / product showcase / editorial statement / transformation)
+3. Visual description
+4. Predicted strength (🔥🔥🔥 / 🔥🔥 / 🔥)"""
+
+    countdown_note = ""
+    if account == "athenahuo" and ctx["countdown_suffix"] and ctx["act"] == "act_1":
+        countdown_note = f"\nCURRENT COUNTDOWN CONTEXT: Today is {ctx['days_to_graduation']} days before graduation. You can reference the number in numerical hooks if natural."
+
+    prompt = f"""Generate {count} hook variations for an Instagram Reel about: {topic}
+
+Target account: @{account}
+Positioning: {acct.get('positioning', '')}
+Voice: {acct.get('voice', acct.get('tone', ''))}
+{countdown_note}
+
+{hook_constraint.format(count=count)}
 """
 
     return oneshot(
@@ -34,5 +62,5 @@ End with a recommendation: which 2 hooks to test as trial reels first and why.
         model=config.CLAUDE_MODEL,
         prompt=prompt,
         system_prompt=config.SYSTEM_PROMPT,
-        max_tokens=800,
+        max_tokens=900,
     )
