@@ -39,6 +39,30 @@ def _now_et() -> datetime:
     return datetime.now(ET)
 
 
+# ─── Daily 9am check-in (proactive manager mode) ────────────
+
+async def send_daily_checkin(app: Application):
+    """The Viralt-style daily check-in — proactive strategic nudge."""
+    log.info("📸 Building daily check-in...")
+
+    from ingrid.services.proactive import build_checkin
+
+    try:
+        message = build_checkin()
+        await send_message(app, config.TELEGRAM_CHAT_ID, message)
+        log.info("✅ Daily check-in sent!")
+    except Exception as e:
+        log.error(f"❌ Daily check-in failed: {e}", exc_info=True)
+        try:
+            await send_message(
+                app,
+                config.TELEGRAM_CHAT_ID,
+                f"😅 Daily check-in hit a snag.\nError: {str(e)[:200]}",
+            )
+        except Exception:
+            pass
+
+
 # ─── Weekly content recap (Sunday 7 PM) ─────────────────────
 
 async def send_weekly_content_recap(app: Application):
@@ -91,7 +115,8 @@ Keep it under 200 words. Be direct, strategic, no fluff.
 # ─── Scheduler ───────────────────────────────────────────────
 
 async def scheduler_loop(app: Application):
-    """Simple scheduler — Sunday 7 PM content recap."""
+    """Scheduler — daily 9am check-in + Sunday 7pm weekly recap."""
+    checkin_sent_today = False
     recap_sent_this_week = False
     last_date = None
 
@@ -100,9 +125,19 @@ async def scheduler_loop(app: Application):
         today = now.strftime("%Y-%m-%d")
 
         if today != last_date:
+            checkin_sent_today = False
             if now.weekday() == 0:  # Monday reset
                 recap_sent_this_week = False
             last_date = today
+
+        # Daily check-in (configurable hour/minute, default 9:00 AM ET)
+        if (
+            not checkin_sent_today
+            and now.hour == config.CHECKIN_HOUR
+            and now.minute >= config.CHECKIN_MINUTE
+        ):
+            await send_daily_checkin(app)
+            checkin_sent_today = True
 
         # Sunday 7 PM content recap
         if (
@@ -145,6 +180,10 @@ async def main():
     log.info("🤖 Polling for messages...")
 
     now = _now_et()
+    log.info(
+        f"⏰ Check-in: {config.CHECKIN_HOUR}:{config.CHECKIN_MINUTE:02d} ET | "
+        f"Weekly recap: Sun 7 PM ET"
+    )
     log.info(f"🕐 Current ET: {now.strftime('%I:%M %p')}")
 
     # Startup message — after everything works

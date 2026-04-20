@@ -29,36 +29,52 @@ _chat_history: deque = deque(maxlen=20)
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "📸 Hey Athena! Ingrid here — your content strategist for @athena_hz.\n\n"
-        "Here's what I can do:\n"
+        "I'll send you a daily check-in at 9am ET. In between:\n\n"
+        "🎨 CREATE\n"
         "/idea [topic] — Content idea with hook + strategy\n"
         "/caption <topic> — Draft a caption\n"
-        "/caption_cn <topic> — Bilingual caption (EN + CN)\n"
-        "/hooks <topic> — 5 hook variations for trial reels\n"
-        "/trending — What's hot on IG right now\n"
-        "/repurpose <content> — Multiply one post into many\n"
+        "/caption_cn <topic> — Bilingual caption\n"
+        "/hooks <topic> — 5 hook variations\n\n"
+        "🔥 STRATEGY\n"
+        "/viral [reference] — Viral scan for your niche\n"
+        "/trending — What's hot on IG\n"
+        "/repurpose <content> — Multiply a post\n"
         "/calendar — Weekly content calendar\n"
-        "/review <how it did> — Analyze a post's performance\n"
-        "/logpost <description> — Log a post for calendar context\n"
+        "/review <how it did> — Post performance analysis\n\n"
+        "💾 LIBRARY\n"
+        "/save <note or link> — Save to Inspo Lab\n"
+        "/inspo — Browse Inspo Lab\n"
+        "/inspo search <query> — Search inspo\n"
+        "/logpost <description> — Log a post\n\n"
+        "/checkin — Get today's check-in now\n"
         "/help — All commands\n\n"
-        "Or just text me anything content-related 💬\n\n"
-        "Daily schedule / weather → Moana 🌊\n"
-        "Finance / stocks → Stella 💰"
+        "Or text me anything content-related 💬\n\n"
+        "Schedule/weather → Moana 🌊 · Finance → Stella 💰"
     )
 
 
 async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "📸 <b>Ingrid — Command Menu</b>\n\n"
+        "🌅 <b>Daily</b>\n"
+        "/checkin — Today's strategic check-in (auto-sends 9am ET)\n\n"
         "🎨 <b>Create</b>\n"
         "/idea [topic] — Strategic content idea\n"
         "/caption &lt;topic&gt; — Draft caption\n"
         "/caption_cn &lt;topic&gt; — Bilingual caption\n"
         "/hooks &lt;topic&gt; — A/B hook variations\n\n"
-        "📊 <b>Strategy</b>\n"
+        "🔥 <b>Strategy</b>\n"
+        "/viral [ref] — Viral scan (or analyze a reference)\n"
         "/trending — Trending formats + audios\n"
         "/repurpose &lt;content&gt; — Repurpose suggestions\n"
         "/calendar — Weekly content calendar\n"
         "/review &lt;description&gt; — Post performance analysis\n\n"
+        "💾 <b>Inspo Lab</b>\n"
+        "/save &lt;note or link&gt; — Save inspiration\n"
+        "/inspo — Browse recent saves\n"
+        "/inspo search &lt;word&gt; — Filter by keyword\n"
+        "/inspo &lt;id&gt; — Full breakdown of saved item\n"
+        "/inspo_delete &lt;id&gt; — Remove a saved item\n\n"
         "📝 <b>Track</b>\n"
         "/logpost &lt;description&gt; — Log what you posted\n\n"
         "💬 Or text me anything about content!\n\n"
@@ -196,6 +212,99 @@ async def cmd_review(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("😅 Review analysis failed. Try again?")
 
 
+async def cmd_checkin(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """On-demand version of the daily 9am check-in."""
+    await update.message.reply_text("📸 Reviewing your activity...")
+
+    from ingrid.services.proactive import build_checkin
+
+    try:
+        message = build_checkin()
+        await update.message.reply_text(message, parse_mode=ParseMode.HTML)
+    except Exception as e:
+        log.error(f"Checkin failed: {e}")
+        await update.message.reply_text("😅 Check-in stalled. Try again?")
+
+
+async def cmd_viral(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Viral scan — general niche or deep-dive on a reference."""
+    reference = " ".join(context.args) if context.args else ""
+    await update.message.reply_text("📸 Running viral scan...")
+
+    from ingrid.services.viral_scan import scan_niche, analyze_reference
+
+    try:
+        if reference:
+            result = analyze_reference(reference)
+        else:
+            result = scan_niche()
+        await _send_long(update, result)
+    except Exception as e:
+        log.error(f"Viral scan failed: {e}")
+        await update.message.reply_text("😅 Viral scan failed. Try again?")
+
+
+async def cmd_save(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Save to Inspo Lab."""
+    note = " ".join(context.args) if context.args else ""
+    if not note:
+        await update.message.reply_text(
+            "Usage: /save <note or link>\n"
+            "Example: /save https://instagram.com/reel/xyz — love the transition timing"
+        )
+        return
+
+    await update.message.reply_text("💾 Saving to Inspo Lab...")
+
+    from ingrid.services.inspo_lab import save_item
+
+    try:
+        result = save_item(note)
+        await update.message.reply_text(result, parse_mode=ParseMode.HTML)
+    except Exception as e:
+        log.error(f"Save failed: {e}")
+        await update.message.reply_text("😅 Save failed. Try again?")
+
+
+async def cmd_inspo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Browse / search / view Inspo Lab."""
+    from ingrid.services.inspo_lab import list_recent, search, get_by_id
+
+    args = context.args or []
+
+    try:
+        # /inspo → list recent
+        if not args:
+            result = list_recent(n=10)
+        # /inspo search <query>
+        elif args[0].lower() == "search" and len(args) > 1:
+            result = search(" ".join(args[1:]))
+        # /inspo <id>
+        elif args[0].isdigit():
+            result = get_by_id(int(args[0]))
+        else:
+            # treat as search query
+            result = search(" ".join(args))
+
+        await _send_long_html(update, result)
+    except Exception as e:
+        log.error(f"Inspo browse failed: {e}")
+        await update.message.reply_text("😅 Inspo lookup failed. Try again?")
+
+
+async def cmd_inspo_delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Remove an inspo item by id."""
+    args = context.args or []
+    if not args or not args[0].isdigit():
+        await update.message.reply_text("Usage: /inspo_delete <id>")
+        return
+
+    from ingrid.services.inspo_lab import delete
+
+    result = delete(int(args[0]))
+    await update.message.reply_text(result)
+
+
 async def cmd_logpost(update: Update, context: ContextTypes.DEFAULT_TYPE):
     description = " ".join(context.args) if context.args else ""
     if not description:
@@ -260,18 +369,44 @@ async def _send_long(update: Update, text: str):
         await update.message.reply_text(text)
 
 
+async def _send_long_html(update: Update, text: str):
+    """Same as _send_long but parses HTML, with plain-text fallback per chunk."""
+    MAX = 4000
+    chunks = []
+    while len(text) > MAX:
+        split = text.rfind("\n", 0, MAX)
+        if split == -1:
+            split = MAX
+        chunks.append(text[:split])
+        text = text[split:].lstrip("\n")
+    if text.strip():
+        chunks.append(text)
+
+    for chunk in chunks:
+        try:
+            await update.message.reply_text(chunk, parse_mode=ParseMode.HTML)
+        except Exception as e:
+            log.warning(f"HTML send failed, falling back to plain: {e}")
+            await update.message.reply_text(chunk)
+
+
 # ─── Registration ────────────────────────────────────────────
 
 async def set_commands(app: Application):
     await app.bot.set_my_commands([
+        BotCommand("checkin", "Today's strategic check-in"),
         BotCommand("idea", "Content idea + strategy"),
         BotCommand("caption", "Draft a caption"),
         BotCommand("caption_cn", "Bilingual caption"),
         BotCommand("hooks", "A/B hook variations"),
+        BotCommand("viral", "Viral scan for your niche"),
         BotCommand("trending", "What's trending on IG"),
         BotCommand("repurpose", "Repurpose content"),
         BotCommand("calendar", "Weekly content calendar"),
         BotCommand("review", "Analyze post performance"),
+        BotCommand("save", "Save to Inspo Lab"),
+        BotCommand("inspo", "Browse Inspo Lab"),
+        BotCommand("inspo_delete", "Delete an inspo item"),
         BotCommand("logpost", "Log what you posted"),
         BotCommand("help", "All commands"),
     ])
@@ -280,13 +415,18 @@ async def set_commands(app: Application):
 def register_handlers(app: Application):
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CommandHandler("help", cmd_help))
+    app.add_handler(CommandHandler("checkin", cmd_checkin))
     app.add_handler(CommandHandler("idea", cmd_idea))
     app.add_handler(CommandHandler("caption", cmd_caption))
     app.add_handler(CommandHandler("caption_cn", cmd_caption_cn))
     app.add_handler(CommandHandler("hooks", cmd_hooks))
+    app.add_handler(CommandHandler("viral", cmd_viral))
     app.add_handler(CommandHandler("trending", cmd_trending))
     app.add_handler(CommandHandler("repurpose", cmd_repurpose))
     app.add_handler(CommandHandler("calendar", cmd_calendar))
     app.add_handler(CommandHandler("review", cmd_review))
+    app.add_handler(CommandHandler("save", cmd_save))
+    app.add_handler(CommandHandler("inspo", cmd_inspo))
+    app.add_handler(CommandHandler("inspo_delete", cmd_inspo_delete))
     app.add_handler(CommandHandler("logpost", cmd_logpost))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))

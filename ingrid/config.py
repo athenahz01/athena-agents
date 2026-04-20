@@ -85,6 +85,11 @@ CONTENT_PILLARS = [
     },
 ]
 
+# ─── Daily Check-in Schedule ───────────────────────────────
+# Fires once per day on Ingrid's scheduler loop
+CHECKIN_HOUR = int(os.getenv("INGRID_CHECKIN_HOUR", "9"))
+CHECKIN_MINUTE = int(os.getenv("INGRID_CHECKIN_MINUTE", "0"))
+
 # ─── Identity ──────────────────────────────────────────────
 AGENT_NAME = "Ingrid"
 AGENT_EMOJI = "📸"
