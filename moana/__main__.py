@@ -70,37 +70,18 @@ async def send_morning_brief(app: Application):
             pass
 
 
-async def send_weekly_recap(app: Application):
-    log.info("🌊 Building weekly recap...")
-
-    from moana.services.recap_builder import build_weekly_recap
-    from moana.formatters.telegram_formatter import format_weekly_recap
-    from moana.services.activity import cleanup_old_data
-
-    try:
-        data = build_weekly_recap()
-        await send_message(app, config.TELEGRAM_CHAT_ID, format_weekly_recap(data))
-        cleanup_old_data(days_to_keep=30)
-        log.info("✅ Weekly recap sent!")
-    except Exception as e:
-        log.error(f"❌ Weekly recap failed: {e}", exc_info=True)
-
-
 async def scheduler_loop(app: Application):
     """Simple scheduler — checks every 30s if it's time to fire."""
     brief_sent_today = False
-    recap_sent_this_week = False
     last_date = None
 
     while True:
         now = _now_et()
         today = now.strftime("%Y-%m-%d")
 
-        # Reset flags at midnight
+        # Reset flag at midnight
         if today != last_date:
             brief_sent_today = False
-            if now.weekday() == 0:  # Monday
-                recap_sent_this_week = False
             last_date = today
 
         # Morning brief
@@ -111,16 +92,6 @@ async def scheduler_loop(app: Application):
         ):
             await send_morning_brief(app)
             brief_sent_today = True
-
-        # Weekly recap — Sunday 8 PM
-        if (
-            not recap_sent_this_week
-            and now.weekday() == 6
-            and now.hour == 20
-            and now.minute >= 0
-        ):
-            await send_weekly_recap(app)
-            recap_sent_this_week = True
 
         await asyncio.sleep(30)
 
@@ -157,7 +128,7 @@ async def main():
 
     # Scheduler info
     now = _now_et()
-    log.info(f"⏰ Brief: {config.BRIEF_HOUR}:{config.BRIEF_MINUTE:02d} ET | Recap: Sun 8 PM ET")
+    log.info(f"⏰ Brief: {config.BRIEF_HOUR}:{config.BRIEF_MINUTE:02d} ET")
     log.info(f"🕐 Current ET: {now.strftime('%I:%M %p')}")
 
     # Startup message — ONLY after everything works
